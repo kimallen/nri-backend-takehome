@@ -31,18 +31,7 @@ class Strand
 		@strand_name = args[:strand_name]
 		@standards = []
 	end
-#creating a method to create a list of strands to cycle through
-	# def strands_for_quiz(num_questions, num_strands)
-	# 	strand_list = []
-	# 	strands = [1..num_strands]
-	# 	strands.shuffle!
-	# 	i = 0
-	# 	until strand_list.length == num_questions
-	# 		strand_list << strands[i]
-	# 		i += 1
-	# 	end	
-	# 	return strand_list
-	# end
+
 end
 
 class Standard
@@ -65,7 +54,19 @@ end
 
 class CustomQuiz
 	def initialize
+		#creating a method to create a list of strands to cycle through
+	end
 
+	def strands_for_quiz(num_questions, num_strands)
+		strand_list = []
+		strands = [1..num_strands]
+		strands.shuffle!
+		i = 0
+		until strand_list.length == num_questions
+			strand_list << strands[i]
+			i += 1
+		end	
+		return strand_list
 	end
 	
 	def generate_quiz(num_questions)
@@ -73,12 +74,13 @@ class CustomQuiz
 end
 
 class Parser
-questions_array = []
+
+	attr_reader :standard_questions
 
 	def initialize(file)
 		@file = file
 		@strands_array = []
-		@standards_array = []
+		@standard_questions = []
 	end
 
 	def parse_file
@@ -86,18 +88,34 @@ questions_array = []
 		CSV.foreach(@file, :headers => true) do |row|
 		 
 		  strand = Strand.new(strand_id: row["strand_id"], strand_name: row["strand_name"])
+
 		  question = Question.new(question_id: row["question_id"], difficulty: row["difficulty"])
-		  standard = Standard.new(standard_id: row["standard_id"], standard_name: row["standard_name"])
-		  @standards_array << question
+		  
+		  Standard.all.each do |single_standard|
+		  	if single_standard.standard_id != row["standard_id"]
+			  standard = Standard.new(standard_id: row["standard_id"], standard_name: row["standard_name"])
+			  standards << standard
+			end
+		  # if standard_questions.include? question == false
+
+		  	
+		  	p @standard_questions << question
+
+		  if strand.standards.include? standard == false
+			  strand.standards << standard
+			end
+
+			standard.questions
+			p "***************"
+			standard
 		  # loop through standards_array, check if the standard exists.  If not, push the object into the array
-		  if @strands_array.include? standard == false
-		  	@strands_array << standard
-		  end
 		end
 
 	end
 
 end
 
+parser = Parser.new("questions.csv")
+parser.parse_file
 
 	
