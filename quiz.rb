@@ -21,6 +21,7 @@
 #return the question_id of each of the chosen questions
 
 require "csv"
+require "activerecord"
 
 
 class Strand
@@ -90,22 +91,22 @@ class Parser
 		  strand = Strand.new(strand_id: row["strand_id"], strand_name: row["strand_name"])
 
 		  question = Question.new(question_id: row["question_id"], difficulty: row["difficulty"])
-		  
-		  Standard.all.each do |single_standard|
-		  	if single_standard.standard_id != row["standard_id"]
-			  standard = Standard.new(standard_id: row["standard_id"], standard_name: row["standard_name"])
-			  standards << standard
+		  standards = Standard.all
+		  standards.each do |single_standard|
+		  	if single_standard.standard_id == row["standard_id"]
+			  	standard = Standard.find_by(standard_id: row["standard_id"])
+			  else
+			  	standard = Standard.new(standard_id: row["standard_id"], standard_name: row["standard_name"])
+				end
 			end
 		  # if standard_questions.include? question == false
 
-		  	
-		  	p @standard_questions << question
+		  p standard.questions << question
 
-		  if strand.standards.include? standard == false
-			  strand.standards << standard
-			end
+		 #  if strand.standards.include? standard == false
+			#   strand.standards << standard
+			# end
 
-			standard.questions
 			p "***************"
 			standard
 		  # loop through standards_array, check if the standard exists.  If not, push the object into the array
