@@ -54,20 +54,26 @@ class Question
 end
 
 class CustomQuiz
-	def initialize
+	attr_reader :num_questions
+	def initialize(num_questions)
+		@num_questions = num_questions
 	end
 
 	#creating a method to create a list of strands to cycle through
-	def strands_for_quiz(num_questions, num_strands)
-		strand_list = []
-		strands = [1..num_strands]
-		strands.shuffle!
-		i = 0
-		until strand_list.length == num_questions
-			strand_list << strands[i]
-			i += 1
-		end	
-		return strand_list
+	def questions_for_quiz
+		quiz_questions = []
+		all_strands = [1..@strands.length]
+		all_standards = [1..6]
+		all_questions = [1..12]
+		
+
+		until quiz_questions.length == @num_questions
+			
+		end
+
+
+			end 
+		end
 	end
 	
 	def generate_quiz(num_questions)
@@ -120,7 +126,7 @@ class Parser
 
 		  p '****************'
 		  strand.standards << standard
-		 	p strand
+		 	
 		end
 	end
 
