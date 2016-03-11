@@ -55,25 +55,21 @@ end
 
 class CustomQuiz
 	attr_reader :num_questions
-	def initialize(num_questions)
+	def initialize(num_questions, file_questions)
 		@num_questions = num_questions
+		@file_questions = file_questions
 	end
 
 	#creating a method to create a list of strands to cycle through
 	def questions_for_quiz
 		quiz_questions = []
-		all_strands = [1..@strands.length]
+		all_strands = [1..@file_questions.length]
 		all_standards = [1..6]
 		all_questions = [1..12]
 		
+		@file_questions[1].standards[0].questions[0]
 
-		until quiz_questions.length == @num_questions
-			
-		end
-
-
-			end 
-		end
+	
 	end
 	
 	def generate_quiz(num_questions)
@@ -124,15 +120,17 @@ class Parser
 			  @strands << strand
 		  end
 
-		  p '****************'
 		  strand.standards << standard
 		 	
 		end
+		@strands
 	end
 
 end
 
 parser = Parser.new("questions.csv")
-parser.parse_file
-
+strands = parser.parse_file
+strands[0].standards[0].questions[0]
+quiz = CustomQuiz.new(5, parser.strands)
+p quiz.questions_for_quiz
 	
