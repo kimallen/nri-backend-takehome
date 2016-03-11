@@ -52,14 +52,16 @@ class Question
 end
 
 class CustomQuiz
-	attr_accessor :counter_hash, :standards_counts, :questions_counts, :question_ids
+	attr_accessor :counter_hash, :strand1_standards_counts, :strand2_standards_counts, :strand1_questions_counts, :strand2_questions_counts, :question_ids
 	attr_reader :num_questions
 
 	def initialize(num_questions, strands)
 		@num_questions = num_questions
 		@strands = strands
-		@standards_counts = {}
-		@questions_counts = {}
+		@strand1_standards_counts = {}
+		@strand2_standards_counts = {}
+		@strand_1_questions_counts = {}
+		@strand_2_questions_counts = {}
 		@quiz_questions = []
 		@question_ids = []
 	end
@@ -82,36 +84,45 @@ class CustomQuiz
 		self.standards_starting_count
 		self.questions_starting_count
 		
-		# until @quiz_questions.length >= @num_questions
+		@strands[0].standards.shuffle!
+		@strands[1].standards.shuffle!
+		
+		# while @quiz_questions.length <= @num_questions
 
 			if @quiz_questions.length.even?
-				strand = @strands[0]
+				strand = @strands[0]	
 			else
 				strand = @strands[1]
 			end
-
-			strand.standards.each_with_index do |standard, index|
-				min_used_standard = @standards_counts.min_by {|k, v| v}
+			# strand.standards.rotate!
 				
-				if standard.standard_name == min_used_standard[0]
-					standards_counter(min_used_standard[0])
-				end
-				#returns all that meet min (as array key/value pairs)
-				min_used_question = questions_counts.min_by {|k, v| v}
-				
+			strand.standards.each do |standard|
+				p standard.standard_name
 				standard.questions.map do |question|
-					if question.question_id == min_used_question[0]
-						questions_counter(min_used_question[0])
-						@quiz_questions << question
+					#finds the first of the standards with fewest questions on the test
+					if strand == @strands[0]
+					p min_used_standard = @strands1.standards_counts.min_by {|k, v| v}
+					p min_used_question = @strands1_questions_counts.min_by {|k, v| v}
+					else
+						min_used_standard = @strands2.standards_counts.min_by {|k, v| v}
+						min_used_question = @strands2_questions_counts.min_by {|k, v| v}
+					end
+					#finds the first of the questions with fewest questions on the test
+					
+					# p '*****question******'
+					# p question
+					# p standard.standard_name
+					# p min_used_standard[0]
+					if standard.standard_name == min_used_standard[0]
+						if question.question_id == min_used_question[0]
+							p standards_counter(min_used_standard[0], strand)
+							p questions_counter(min_used_question[0], strand)
+							p "quiz questions list"
+							p @quiz_questions << question
+							p @quiz_questions.count
+						end
 					end
 				end
-				
-				
-				# if @quiz_questions.length >= @num_questions
-				# 	p @standards_counts
-				# 	p @questions_counts
-				# 	return @quiz_questions
-				# end
 			end
 			@quiz_questions
 		# end
@@ -119,29 +130,40 @@ class CustomQuiz
 	end
 	#creates hash of all standards with value (num used in quiz) set to 0
 	def standards_starting_count
-		@strands.each do |strand|
-			strand.standards.each do |standard|
-				@standards_counts[standard.standard_name] = 0
+		# @strands.each do |strand|
+			@strands[0].standards.each do |standard|
+				@strand1_standards_counts[standard.standard_name] = 0
 			end
-		end
-		@standards_counts
+			@strands[1].standards.each do |standard|
+				@strand2_standards_counts[standard.standard_name] = 0
+			end
+		# end
+		# @standards_counts
 	end
 
 	#Adds to each item in the standard_counts as it is utilized in the quiz
-	def standards_counter(category)
-		@standards_counts[category] += 1
-		@standards_counts
+	def standards_counter(category, strand)
+		if strand == @strand[0]
+		@strand1_standards_counts[category] += 1
+		else
+			@strand2_standards_counts[category] += 1
+		end
 	end
 
 	def questions_starting_count
-		@strands.each do |strand|
-			strand.standards.each do |standard|
+		# @strands.each do |strand|
+			@strands[0].standards.each do |standard|
 				standard.questions.each do |question|
-					@questions_counts[question.question_id] = 0
+					@strand1_questions_counts[question.question_id] = 0
 				end
 			end
-		end
-		@questions_counts
+			@strands[1].standards.each do |standard|
+				standard.questions.each do |question|
+					@strand2_questions_counts[question.question_id] = 0
+				end
+			end
+		# end
+		# @questions_counts
 	end
 
 	def questions_counter(category)
@@ -212,6 +234,7 @@ puts "How many quiz questions do you want?"
 	# if quantity > 0 && quantity.
 quiz = CustomQuiz.new(quantity, parser.strands)
 p quiz.questions_for_quiz
+puts "The questions for the quiz are these:"
 p quiz.question_ids_list
 
 	
