@@ -69,7 +69,7 @@ class CustomQuiz
 		self.questions_for_quiz.each do |q|
 			@question_ids << q.question_id
 		end
-		p @question_ids[0..(@num_questions-1)]
+		@question_ids[0..(@num_questions-1)]
 	end
 
 	def questions_for_quiz
@@ -81,29 +81,41 @@ class CustomQuiz
 		# return the array of question_list of length of num_questions
 		self.standards_starting_count
 		self.questions_starting_count
+		
 		# until @quiz_questions.length >= @num_questions
-			
-			@strands[0].standards.each do |standard|
+
+			if @quiz_questions.length.even?
+				strand = @strands[0]
+			else
+				strand = @strands[1]
+			end
+
+			strand.standards.each_with_index do |standard, index|
 				min_used_standard = @standards_counts.min_by {|k, v| v}
+				
 				if standard.standard_name == min_used_standard[0]
 					standards_counter(min_used_standard[0])
 				end
 				#returns all that meet min (as array key/value pairs)
 				min_used_question = questions_counts.min_by {|k, v| v}
 				
-				standard.questions.each do |question|
+				standard.questions.map do |question|
 					if question.question_id == min_used_question[0]
 						questions_counter(min_used_question[0])
 						@quiz_questions << question
 					end
 				end
-				if @quiz_questions.length >= @num_questions
-					p @standards_counts
-					p @questions_counts
-					return @quiz_questions
-				end
+				
+				
+				# if @quiz_questions.length >= @num_questions
+				# 	p @standards_counts
+				# 	p @questions_counts
+				# 	return @quiz_questions
+				# end
 			end
+			@quiz_questions
 		# end
+				
 	end
 	#creates hash of all standards with value (num used in quiz) set to 0
 	def standards_starting_count
@@ -122,11 +134,11 @@ class CustomQuiz
 	end
 
 	def questions_starting_count
-			@strands.each do |strand|
-				strand.standards.each do |standard|
-					standard.questions.each do |question|
-						@questions_counts[question.question_id] = 0
-					end
+		@strands.each do |strand|
+			strand.standards.each do |standard|
+				standard.questions.each do |question|
+					@questions_counts[question.question_id] = 0
+				end
 			end
 		end
 		@questions_counts
@@ -194,9 +206,12 @@ end
 
 parser = Parser.new("questions.csv")
 strands = parser.parse_file
-strands[0].standards[0].questions[0]
-quiz = CustomQuiz.new(5, parser.strands)
-quiz.questions_for_quiz
+
+puts "How many quiz questions do you want?"
+	quantity = gets.chomp.to_i
+	# if quantity > 0 && quantity.
+quiz = CustomQuiz.new(quantity, parser.strands)
+p quiz.questions_for_quiz
 p quiz.question_ids_list
 
 	
