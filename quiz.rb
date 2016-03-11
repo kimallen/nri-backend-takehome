@@ -21,8 +21,6 @@
 #return the question_id of each of the chosen questions
 
 require "csv"
-require "active_record"
-
 
 class Strand
 	attr_accessor :strand_id, :strand_name
@@ -79,13 +77,14 @@ class CustomQuiz
 				if standard.standard_name == min_key
 					standards_counter(min_key)
 				end
-					min_key = standard.questions.min_by |k, v|{v}.key
-					standard.questions.each do |question|
-						if question.question_id == min_key
-							@quiz_questions << question
-						end
+				
+				min_key = standard.questions.min_by |k, v|{v}.key
+				standard.questions.each do |question|
+					if question.question_id == min_key
+						@quiz_questions << question
 					end
 				end
+			end
 		end
 		# @strands[1].standards[0].questions[0]
 	end
