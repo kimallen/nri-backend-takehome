@@ -55,9 +55,9 @@ end
 
 class CustomQuiz
 	def initialize
-		#creating a method to create a list of strands to cycle through
 	end
 
+	#creating a method to create a list of strands to cycle through
 	def strands_for_quiz(num_questions, num_strands)
 		strand_list = []
 		strands = [1..num_strands]
@@ -76,39 +76,52 @@ end
 
 class Parser
 
-	attr_reader :standard_questions
+	attr_reader :standards, :strands
 
 	def initialize(file)
 		@file = file
-		@strands_array = []
 		@standards = []
-		@standard_questions = []
+		@strands = []
 	end
 
 	def parse_file
 
 		CSV.foreach(@file, :headers => true) do |row|
-		 
-		  strand = Strand.new(strand_id: row["strand_id"], strand_name: row["strand_name"])
 
 		  question = Question.new(question_id: row["question_id"], difficulty: row["difficulty"])
 		  
 		  #Creates association "standard has many questions"
-		  standard = ''
+		  standard = nil
 		  @standards.each do |single_standard|
 		  	if single_standard.standard_id == row["standard_id"]
 			  	standard = single_standard
 				end
 			end
-		  if standard == ''	
+		  
+		  if standard == nil	
 		  	standard = Standard.new(standard_id: row["standard_id"], standard_name: row["standard_name"])
 			  @standards << standard
 		  end
-		  # if standard_questions.include? question == false
-		  p standard.questions << question
-		 	  
-		end
 
+		  standard.questions << question
+		 	  
+		 	#Creates association of "strand has many standards"
+		 	 strand = nil
+		  @strands.each do |single_strand|
+		  	if single_strand.strand_id == row["strand_id"]
+			  	strand = single_strand
+				end
+			end
+		  
+		  if strand == nil	
+		  	strand = Strand.new(strand_id: row["strand_id"], strand_name: row["strand_name"])
+			  @strands << strand
+		  end
+
+		  p '****************'
+		  strand.standards << standard
+		 	p strand
+		end
 	end
 
 end
