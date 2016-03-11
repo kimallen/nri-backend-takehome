@@ -100,6 +100,7 @@ class CustomQuiz
 				p standard.standard_name
 				standard.questions.map do |question|
 					#finds the first of the standards with fewest questions on the test
+					#finds the first of the questions with fewest questions on the test
 					if strand == @strands[0]
 					p min_used_standard = @strands1.standards_counts.min_by {|k, v| v}
 					p min_used_question = @strands1_questions_counts.min_by {|k, v| v}
@@ -107,12 +108,7 @@ class CustomQuiz
 						min_used_standard = @strands2.standards_counts.min_by {|k, v| v}
 						min_used_question = @strands2_questions_counts.min_by {|k, v| v}
 					end
-					#finds the first of the questions with fewest questions on the test
 					
-					# p '*****question******'
-					# p question
-					# p standard.standard_name
-					# p min_used_standard[0]
 					if standard.standard_name == min_used_standard[0]
 						if question.question_id == min_used_question[0]
 							p standards_counter(min_used_standard[0], strand)
@@ -151,14 +147,13 @@ class CustomQuiz
 	end
 
 	def questions_starting_count
-		# @strands.each do |strand|
-			@strands[0].standards.each do |standard|
-				standard.questions.each do |question|
+			@strands[0].standards.map do |standard|
+				standard.questions.map do |question|
 					@strand1_questions_counts[question.question_id] = 0
 				end
 			end
-			@strands[1].standards.each do |standard|
-				standard.questions.each do |question|
+			@strands[1].standards.map do |standard|
+				standard.questions.map do |question|
 					@strand2_questions_counts[question.question_id] = 0
 				end
 			end
